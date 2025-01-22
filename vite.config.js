@@ -2,7 +2,6 @@
 
 import { defineConfig } from 'vite';
 
-
 export default defineConfig({
   test: {
     includeTaskLocation: true,
@@ -16,11 +15,13 @@ export default defineConfig({
       providerOptions: {
         launch: {
           devtools: true
+        }
+      },
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html']
       }
     }
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html']
-    }
   }
-})
+});
+
