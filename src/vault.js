@@ -1,9 +1,32 @@
 import * as kdbxweb from 'kdbxweb';
+import { argon2d, argon2id } from '@noble/hashes/argon2';
 
 const VAULT_DB_NAME = 'Sample Vault';
 const VAULT_DB_GROUP_NAME = 'Sample Group';
 const subtle = window.crypto.subtle;
 let vault = null;
+
+const vaultArgon2 = ((password, salt,
+  memory, iterations, length, parallelism, type, version) => new Promise((resolve, reject) => {
+    const argon2 = type === 0 ? argon2d : argon2id;
+    try {
+      const bytes = argon2(
+        new Uint8Array(password),
+        new Uint8Array(salt),
+        {
+          t: iterations,
+          m: memory,
+          p: parallelism,
+          dkLen: length,
+          version,
+        },
+      );
+      resolve(bytes.buffer);
+    } catch (error) {
+      reject(error);
+    }
+
+  }));
 
 /**
  * Creates a new database if non exists, minimal check for passphrase
@@ -68,48 +91,6 @@ const clearDatabase = () => {
   vault = null;
   return Promise.resolve();
 };
-
-const vaultArgon2 = ((password, salt,
-  memory, iterations, length, parallelism, type, version) => new Promise((resolve, reject) => {
-    console.log('Vault Argon2');
-
-    // Encode password and salt to ArrayBuffers
-    const encoder = new TextEncoder();
-    const passwordBuffer = encoder.encode(password);
-    const saltBuffer = encoder.encode(salt);
-    const algorithm = {
-      name: 'PBKDF2',
-      salt: saltBuffer,
-      iterations,
-      hash: 'SHA-256',
-    };
-    const derivedKeyAlgorithm = {
-      name: 'AES-CBC',
-      length: 256,
-    };
-
-
-    subtle.importKey('raw', passwordBuffer, 'PBKDF2', false, ['deriveKey'])
-      .then(baseKey => subtle.deriveKey(
-        algorithm,
-        baseKey,
-        derivedKeyAlgorithm,
-        true,
-        ['encrypt']
-      ))
-      .then(derivedKey => subtle.exportKey('raw', derivedKey))
-      .then(derivedKey => {
-        const expandedKey = new Uint8Array(length);
-        for (let i = 0; i < length; i++) {
-          expandedKey[i] = derivedKey[i % derivedKey.byteLength] ^ (i % 256);
-        }
-        const result = Array.from(expandedKey)
-          .map((byte) => byte.toString(16).padStart(2, '0'))
-          .join('');
-        resolve(expandedKey);
-      })
-      .catch(reject);
-  }));
 
 const init = async () => {
   /** Code to run on startup */

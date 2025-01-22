@@ -2,15 +2,21 @@
 
 import { defineConfig } from 'vite';
 
-
 export default defineConfig({
   test: {
-    globals: true,
-    environment: 'jsdom',
+    includeTaskLocation: true,
     include: ['**/*.test.js'],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html']
+    name: 'browser',
+    browser: {
+      provider: 'playwright',
+      headless: true,
+      enabled: true,
+      name: 'chromium',
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html']
+      }
     }
   }
-})
+});
+
