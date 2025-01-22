@@ -6,6 +6,28 @@ const VAULT_DB_GROUP_NAME = 'Sample Group';
 const subtle = window.crypto.subtle;
 let vault = null;
 
+const vaultArgon2 = ((password, salt,
+  memory, iterations, length, parallelism, type, version) => new Promise((resolve, reject) => {
+    const argon2 = type === 0 ? argon2d : argon2id;
+    try {
+      const bytes = argon2(
+        new Uint8Array(password),
+        new Uint8Array(salt),
+        {
+          t: iterations,
+          m: memory,
+          p: parallelism,
+          dkLen: length,
+          version,
+        },
+      );
+      resolve(bytes.buffer);
+    } catch (error) {
+      reject(error);
+    }
+
+  }));
+
 /**
  * Creates a new database if non exists, minimal check for passphrase
  * 
@@ -72,7 +94,7 @@ const clearDatabase = () => {
 
 const init = async () => {
   /** Code to run on startup */
-  kdbxweb.CryptoEngine.setArgon2Impl(argon2d);
+  kdbxweb.CryptoEngine.setArgon2Impl(vaultArgon2);
   console.log('Vault initialized');
   return Promise.resolve();
 };

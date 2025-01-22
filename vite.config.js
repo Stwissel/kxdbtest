@@ -9,14 +9,9 @@ export default defineConfig({
     name: 'browser',
     browser: {
       provider: 'playwright',
-      headless: false,
+      headless: true,
       enabled: true,
       name: 'chromium',
-      providerOptions: {
-        launch: {
-          devtools: true
-        }
-      },
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html']

@@ -30,12 +30,29 @@ const statusUpdate = (message) => {
 
 const password = 'password';
 await init();
-let db = await createDatabase(password);
-console.log(db);
-statusUpdate('Database created');
-let arrayBuffer = await saveDatabase(db);
-console.log(arrayBuffer);
-statusUpdate('Database saved');
-let loadedDb = await loadDatabase(arrayBuffer, 'test');
-console.log(loadedDb);
-statusUpdate('Database loaded');
+let db;
+let arrayBuffer;
+let loadedDb;
+
+try {
+  db = await createDatabase(password);
+  console.log(db);
+  statusUpdate('Database created');
+} catch (err) {
+  statusUpdate(`Error: ${err.message}`);
+}
+try {
+  arrayBuffer = await saveDatabase(db);
+  console.log(arrayBuffer);
+  statusUpdate('Database saved');
+} catch (err) {
+  statusUpdate(`Error: ${err.message}`);
+}
+
+try {
+  loadedDb = await loadDatabase(arrayBuffer, password);
+  console.log(loadedDb);
+  statusUpdate('Database loaded');
+} catch (err) {
+  statusUpdate(`Error: ${err.message}`);
+}
