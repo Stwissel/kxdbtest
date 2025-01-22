@@ -1,4 +1,5 @@
 import * as kdbxweb from 'kdbxweb';
+import { argon2d, argon2id } from '@noble/hashes/argon2';
 
 const VAULT_DB_NAME = 'Sample Vault';
 const VAULT_DB_GROUP_NAME = 'Sample Group';
@@ -69,51 +70,9 @@ const clearDatabase = () => {
   return Promise.resolve();
 };
 
-const vaultArgon2 = ((password, salt,
-  memory, iterations, length, parallelism, type, version) => new Promise((resolve, reject) => {
-    console.log('Vault Argon2');
-
-    // Encode password and salt to ArrayBuffers
-    const encoder = new TextEncoder();
-    const passwordBuffer = encoder.encode(password);
-    const saltBuffer = encoder.encode(salt);
-    const algorithm = {
-      name: 'PBKDF2',
-      salt: saltBuffer,
-      iterations,
-      hash: 'SHA-256',
-    };
-    const derivedKeyAlgorithm = {
-      name: 'AES-CBC',
-      length: 256,
-    };
-
-
-    subtle.importKey('raw', passwordBuffer, 'PBKDF2', false, ['deriveKey'])
-      .then(baseKey => subtle.deriveKey(
-        algorithm,
-        baseKey,
-        derivedKeyAlgorithm,
-        true,
-        ['encrypt']
-      ))
-      .then(derivedKey => subtle.exportKey('raw', derivedKey))
-      .then(derivedKey => {
-        const expandedKey = new Uint8Array(length);
-        for (let i = 0; i < length; i++) {
-          expandedKey[i] = derivedKey[i % derivedKey.byteLength] ^ (i % 256);
-        }
-        const result = Array.from(expandedKey)
-          .map((byte) => byte.toString(16).padStart(2, '0'))
-          .join('');
-        resolve(expandedKey);
-      })
-      .catch(reject);
-  }));
-
 const init = async () => {
   /** Code to run on startup */
-  kdbxweb.CryptoEngine.setArgon2Impl(vaultArgon2);
+  kdbxweb.CryptoEngine.setArgon2Impl(argon2d);
   console.log('Vault initialized');
   return Promise.resolve();
 };
