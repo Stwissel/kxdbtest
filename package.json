@@ -15,7 +15,7 @@
     "@vitest/coverage-v8": "^2.1.8",
     "express": "^4.21.2",
     "playwright": "^1.49.1",
-    "vite": "^6.0.7",
+    "vite": "^6.3.6",
     "vitest": "^2.1.8"
   },
   "dependencies": {
