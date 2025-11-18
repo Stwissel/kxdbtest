@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@vitest/browser": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^4.0.10",
     "express": "^4.21.2",
     "playwright": "^1.49.1",
     "vite": "^6.0.7",
